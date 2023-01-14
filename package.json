@@ -1,0 +1,28 @@
+{
+  "name": "nowscbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@puregram/hear": "^2.0.2",
+    "@puregram/prompt": "^1.2.0",
+    "axios": "^1.2.2",
+    "puregram": "^2.9.8",
+    "sequelize": "^6.28.0",
+    "soundcloud.ts": "^0.4.9",
+    "sqlite3": "^5.1.4"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "eslint": "^8.31.0",
+    "typescript": "^4.9.4"
+  }
+}
