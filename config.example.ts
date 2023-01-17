@@ -1,9 +1,21 @@
 export interface IConfig {
-  telegram_token: string;
+  /**
+   * Bot Token
+   */
+  telegramToken: string;
+  /**
+   * Telegram Bot API Url
+   */
+  apiBaseUrl?: string;
+  /**
+   * User ID that should receive Telegram Audios (need for upload arraybuffers and transform to fileId) 
+   */
+  receiveAudiosUserId: string | number;
 }
 
 export const config: IConfig = {
-  telegram_token: ''
+  telegramToken: '',
+  receiveAudiosUserId: ''
 };
 
 export default config;

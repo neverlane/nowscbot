@@ -16,7 +16,6 @@
     "axios": "^1.2.2",
     "puregram": "^2.9.8",
     "sequelize": "^6.28.0",
-    "soundcloud.ts": "^0.4.9",
     "sqlite3": "^5.1.4"
   },
   "devDependencies": {

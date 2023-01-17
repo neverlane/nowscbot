@@ -1,3 +1,4 @@
-import { SoundcloudTrack } from 'soundcloud.ts';
+import { SoundCloudTrack } from './types/soundcloud';
 
-export const inlineTracksCacheMap = new Map<string, SoundcloudTrack>();
+export const inlineTracksCacheMap = new Map<string, SoundCloudTrack>();
+export const inlineTracksFilesCacheMap = new Map<string, string>();

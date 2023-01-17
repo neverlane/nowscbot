@@ -1,10 +1,10 @@
 import { ChosenInlineResultContext, MediaSourceType } from 'puregram';
-import { print } from '~/helpers';
-import SoundCloud from 'soundcloud.ts';
-import { inlineTracksCacheMap } from '~/inline-cache';
+import { print, soundcloudStreamLink, telegramUploadAudio } from '~/helpers';
+import { inlineTracksCacheMap, inlineTracksFilesCacheMap } from '~/inline-cache';
+import axios from 'axios';
+import { TelegramCache } from '~/database';
 
 const logChosenInlineQuery = print.create('(chosen-inline-query)');
-const soundcloud = new SoundCloud();
 
 export async function onChosenInlineQuery(context: ChosenInlineResultContext) {
   logChosenInlineQuery(`(sender: ${context.senderId} | resultId: ${context.resultId})`, `(query[${context.query.length}] -> ${context.query})`);
@@ -13,30 +13,64 @@ export async function onChosenInlineQuery(context: ChosenInlineResultContext) {
   const hasTrack = inlineTracksCacheMap.has(context.resultId);
   if (!hasTrack) return context.telegram.api.editMessageText({
     inline_message_id: inlineMessageId,
-    text: '😖 Cannot find track'
+    text: '🐱 Can\'t find song'
   });
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const track = inlineTracksCacheMap.get(context.resultId)!;
   inlineTracksCacheMap.delete(context.resultId);
-  const audio_url = await soundcloud.util.streamLink(track.permalink_url);
-  await context.telegram.api.editMessageMedia({
-    inline_message_id: inlineMessageId,
-    media: {
-      type: 'audio',
-      caption: `via @${context.telegram.bot.username} \\| [listen](${track.permalink_url})`,
-      parse_mode: 'MarkdownV2',
+  
+  try {
+    const audioUrl = await soundcloudStreamLink(track.permalink_url);
+    if (!audioUrl) throw new Error('🐱 Can\'t download song');
+    const audioResponse = await axios.get<ArrayBuffer>(audioUrl, {
+      responseType: 'arraybuffer'
+    });
+    const audio = await telegramUploadAudio({
+      title: track.title,
+      performer: track.user.username,
       thumb: {
         type: MediaSourceType.Url,
-        value: track.artwork_url,
+        value: track.artwork_url
       },
-      title: track.title,
-      media: {
-        type: MediaSourceType.Url,
-        value: audio_url,
-        filename: track.title,
-        forceUpload: true
+      audio: {
+        type: MediaSourceType.ArrayBuffer,
+        value: audioResponse.data,
+        filename: track.title
+      },
+    });
+    const trackCacheId = `soundcloud_${track.id}`;
+    inlineTracksFilesCacheMap.set(trackCacheId, audio.file_id);
+    const [cacheTrack] = await TelegramCache.findOrCreate({
+      where: {
+        soundcloudId: trackCacheId
+      },
+      defaults: {
+        soundcloudId: trackCacheId,
+        telegramFileId: audio.file_id,
+        isCached: true
       }
+    });
+    if (!cacheTrack.isCached) {
+      cacheTrack.isCached = true;
+      await cacheTrack.save();
     }
-  });
-  
+    await context.telegram.api.editMessageMedia({
+      inline_message_id: inlineMessageId,
+      media: {
+        type: 'audio',
+        caption: `via @${context.telegram.bot.username} \\| [listen](${track.permalink_url})`,
+        parse_mode: 'MarkdownV2',
+        media: {
+          type: MediaSourceType.FileId,
+          value: audio.file_id
+        }
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    await context.telegram.api.editMessageText({
+      inline_message_id: inlineMessageId,
+      text: '🐱 Can\'t download song'
+    });
+  }
 }

@@ -3,8 +3,8 @@ import { sequelize } from '../instance';
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
-  declare telegram_id: number;
-  declare soundcloud_token: CreationOptional<string>;
+  declare telegramId: number;
+  declare soundcloudToken: CreationOptional<string>;
 }
 
 User.init({
@@ -13,12 +13,12 @@ User.init({
     primaryKey: true,
     autoIncrement: true
   },
-  telegram_id: {
+  telegramId: {
     type: DataTypes.INTEGER,
     unique: true,
     allowNull: false
   },
-  soundcloud_token: {
+  soundcloudToken: {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: ''
