@@ -34,7 +34,8 @@ cp config.example.ts config.ts
 ### Fill
 ```typescript
 export const config: IConfig = {
-  telegram_token: 'YOUR_TELEGRAM_TOKEN'
+  telegram_token: 'YOUR_TELEGRAM_TOKEN',
+  receiveAudiosUserId: '123123123'
 };
 ```
 
