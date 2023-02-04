@@ -9,3 +9,9 @@ export interface SoundCloudTrack {
     username: string;
   };
 }
+
+export interface SoundCloudUserResponse {
+  full_name: string;
+  permalink: string;
+  urn: string;
+}

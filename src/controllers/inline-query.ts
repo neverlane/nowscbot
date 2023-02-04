@@ -12,7 +12,7 @@ const emptySoundBuffer = readFileSync('assets/empty.mp3').buffer;
 
 export async function onInlineQuery(context: InlineQueryContext) {
   logInlineQuery(`(sender: ${context.senderId})`, `(query[${context.query.length}] -> ${context.query})`);
-  
+
   const [user] = await User.findOrCreate({
     where: {
       telegramId: context.senderId
@@ -30,7 +30,7 @@ export async function onInlineQuery(context: InlineQueryContext) {
     });
 
   const response = await soundcloudGetHistory(user.soundcloudToken);
-  
+
   if (typeof response.data !== 'object' || !('collection' in response.data)) return context.answerInlineQuery([], {
     ...answerInlineQueryDefaultOptions,
     switch_pm_text: 'Reconnect your SoundCloud account',
@@ -81,13 +81,16 @@ export async function onInlineQuery(context: InlineQueryContext) {
       id: audioCacheId,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       audio_file_id: audioFileId,
-      caption: `via @${context.telegram.bot.username} \\| [listen](${track.permalink_url})`,
+      caption: `[listen](${track.permalink_url})`,
       parse_mode: 'MarkdownV2',
       reply_markup: {
-        inline_keyboard: !hasCache ? [[{
+        inline_keyboard: [[!hasCache ? {
           text: 'Loading audio...',
           callback_data: `track_${track.id}`
-        }]] : []
+        } : {
+          text: '❤️ Like',
+          callback_data: `like_track:${track.id}`
+        }]]
       },
     });
   }

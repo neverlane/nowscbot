@@ -1,4 +1,4 @@
-import { ChosenInlineResultContext, MediaSourceType } from 'puregram';
+import { ChosenInlineResultContext, InlineKeyboardBuilder, MediaSourceType } from 'puregram';
 import { print, soundcloudStreamLink, telegramUploadAudio } from '~/helpers';
 import { inlineTracksCacheMap, inlineTracksFilesCacheMap } from '~/inline-cache';
 import axios from 'axios';
@@ -58,13 +58,17 @@ export async function onChosenInlineQuery(context: ChosenInlineResultContext) {
       inline_message_id: inlineMessageId,
       media: {
         type: 'audio',
-        caption: `via @${context.telegram.bot.username} \\| [listen](${track.permalink_url})`,
+        caption: `[listen](${track.permalink_url})`,
         parse_mode: 'MarkdownV2',
         media: {
           type: MediaSourceType.FileId,
           value: audio.file_id
         }
-      }
+      },
+      reply_markup: new InlineKeyboardBuilder().textButton({
+        text: '❤️ Like',
+        payload: `like_track:${track.id}`
+      })
     });
   } catch (error) {
     console.error(error);

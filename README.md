@@ -6,6 +6,9 @@ Feel free to open tickets or send pull requests with improvements. Thanks in adv
 
 Please follow the [contribution guidelines](https://github.com/neverlane/nowscbot/blob/master/CONTRIBUTING.md).
 
+## Changelog
+[Here](https://github.com/neverlane/nowscbot/blob/master/CHANGELOG.md) you can see changelog of nowscbot
+
 ## Requirements
 OSX or Linux or Windows
 
