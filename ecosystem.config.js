@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'nowscbot',
-      script: 'npm run start:dev'
+      script: 'npm run start:prod'
     }
   ]
 };
