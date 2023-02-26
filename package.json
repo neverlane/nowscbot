@@ -1,7 +1,7 @@
 {
   "name": "nowscbot",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.2.0",
+  "description": "src/bot.ts",
   "main": "index.js",
   "scripts": {
     "start:prod": "esr src/bot.ts",
