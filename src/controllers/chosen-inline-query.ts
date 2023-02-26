@@ -2,14 +2,23 @@ import { ChosenInlineResultContext, InlineKeyboardBuilder, MediaSourceType } fro
 import { print, soundcloudStreamLink, telegramUploadAudio } from '~/helpers';
 import { inlineTracksCacheMap, inlineTracksFilesCacheMap } from '~/inline-cache';
 import axios from 'axios';
-import { TelegramCache } from '~/database';
+import { TelegramCache, User } from '~/database';
 
 const logChosenInlineQuery = print.create('(chosen-inline-query)');
 
 export async function onChosenInlineQuery(context: ChosenInlineResultContext) {
   logChosenInlineQuery(`(sender: ${context.senderId} | resultId: ${context.resultId})`, `(query[${context.query.length}] -> ${context.query})`);
   if (!context.inlineMessageId) return;
+  const user = await User.findOne({
+    where: {
+      telegramId: context.senderId,
+    }
+  });
   const { inlineMessageId } = context;
+  if (!user || !user.soundcloudToken) return await context.telegram.api.editMessageText({
+    inline_message_id: inlineMessageId,
+    text: '🐱 Can\'t download song (#1)'
+  });
   const hasTrack = inlineTracksCacheMap.has(context.resultId);
   if (!hasTrack) return context.telegram.api.editMessageText({
     inline_message_id: inlineMessageId,
@@ -20,7 +29,7 @@ export async function onChosenInlineQuery(context: ChosenInlineResultContext) {
   inlineTracksCacheMap.delete(context.resultId);
   
   try {
-    const audioUrl = await soundcloudStreamLink(track.permalink_url);
+    const audioUrl = await soundcloudStreamLink(user.soundcloudToken, track.permalink_url);
     if (!audioUrl) throw new Error('🐱 Can\'t download song');
     const audioResponse = await axios.get<ArrayBuffer>(audioUrl, {
       responseType: 'arraybuffer'
@@ -74,7 +83,7 @@ export async function onChosenInlineQuery(context: ChosenInlineResultContext) {
     console.error(error);
     await context.telegram.api.editMessageText({
       inline_message_id: inlineMessageId,
-      text: '🐱 Can\'t download song'
+      text: '🐱 Can\'t download song (#2)'
     });
   }
 }

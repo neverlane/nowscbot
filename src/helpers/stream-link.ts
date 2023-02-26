@@ -9,11 +9,12 @@ export interface SoundCloudTranscoding {
   url: string;
 }
 
-export const soundcloudStreamLink = async (songUrl: string): Promise<string | null> => {
+export const soundcloudStreamLink = async (token: string, songUrl: string): Promise<string | null> => {
   const host = 'https://soundcloud.com';
   const { pathname } = new URL(songUrl, host);
   const headers = {
     referer: host,
+    authorization: `OAuth ${token}`,
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36'
   };
   try {
